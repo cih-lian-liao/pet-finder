@@ -3,8 +3,8 @@ services:
     name: pet-finder
     env: python
     plan: free
-    buildCommand: "pip install -r requirements-minimal.txt && python manage.py collectstatic --noinput && python manage.py migrate"
-    startCommand: "gunicorn scraper.wsgi:application"
+    buildCommand: "pip install --upgrade pip && pip install -r requirements-prod.txt && python manage.py collectstatic --noinput"
+    startCommand: "python manage.py migrate && gunicorn scraper.wsgi:application"
     envVars:
       - key: DEBUG
         value: "False"
