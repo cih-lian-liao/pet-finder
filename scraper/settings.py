@@ -34,7 +34,10 @@ SECRET_KEY = get_env_variable(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_env_variable('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = get_env_variable('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+_base_allowed = get_env_variable('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+_render_host = os.environ.get('RENDER_EXTERNAL_HOSTNAME', '').strip()
+_wildcard_render = '.onrender.com'
+ALLOWED_HOSTS = [h.strip() for h in (_base_allowed + ([_render_host] if _render_host else []) + [_wildcard_render]) if h.strip()]
 
 
 # Application definition
