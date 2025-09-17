@@ -2,6 +2,12 @@
 
 A modern Django web application for finding adoptable pets from PetFinder.com. This application scrapes pet data and provides a beautiful, user-friendly interface for browsing and filtering pets available for adoption.
 
+## 🌐 Live Demo
+
+**Try the application live:** [https://pet-finder-idta.onrender.com/](https://pet-finder-idta.onrender.com/)
+
+*Note: The demo may take a moment to load as it's hosted on a free tier. Please be patient on first load.*
+
 ## ✨ Features
 
 - **🔍 Advanced Search**: Search pets by location, animal type, and distance
