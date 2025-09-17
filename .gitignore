@@ -84,7 +84,7 @@ yarn-error.log*
 
 # Static files (if using collectstatic)
 staticfiles/
-static/
+# Note: Keep static/ directory for source static files like favicon
 
 # Media files
 media/
