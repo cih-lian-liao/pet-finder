@@ -156,6 +156,19 @@ if 'DATABASE_URL' in os.environ:
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Logging configuration
+# On Render, default to console-only logging to avoid filesystem writes.
+# Locally, include file logging and ensure the logs directory exists.
+LOGS_DIR = BASE_DIR / 'logs'
+IS_RENDER = bool(os.environ.get('RENDER') or os.environ.get('RENDER_EXTERNAL_HOSTNAME'))
+USE_FILE_LOGGING = os.environ.get('USE_FILE_LOGGING', '0' if IS_RENDER else '1').lower() in ('1', 'true')
+
+if USE_FILE_LOGGING:
+    try:
+        os.makedirs(LOGS_DIR, exist_ok=True)
+    except Exception:
+        # If we can't create the directory, fall back to console-only
+        USE_FILE_LOGGING = False
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -170,17 +183,19 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': str(BASE_DIR / 'logs' / 'pet_finder.log'),
-            'formatter': 'verbose',
-        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
+        **({
+            'file': {
+                'level': 'INFO',
+                'class': 'logging.FileHandler',
+                'filename': str(LOGS_DIR / 'pet_finder.log'),
+                'formatter': 'verbose',
+            }
+        } if USE_FILE_LOGGING else {})
     },
     'root': {
         'handlers': ['console'],
@@ -188,7 +203,7 @@ LOGGING = {
     },
     'loggers': {
         'website': {
-            'handlers': ['file', 'console'],
+            'handlers': ['console'] + (['file'] if USE_FILE_LOGGING else []),
             'level': 'INFO',
             'propagate': False,
         },
