@@ -1,113 +1,113 @@
-# 🚀 手動部署指南 - Render.com
+# 🚀 Manual Deployment Guide - Render.com
 
-如果自動部署失敗，請按照以下步驟手動部署：
+If automatic deployment fails, please follow these steps for manual deployment:
 
-## 步驟 1: 創建 Render.com 帳戶
+## Step 1: Create Render.com Account
 
-1. 訪問 [render.com](https://render.com)
-2. 使用 GitHub 帳戶登錄
-3. 連接您的 GitHub 帳戶
+1. Visit [render.com](https://render.com)
+2. Sign in with your GitHub account
+3. Connect your GitHub account
 
-## 步驟 2: 創建數據庫
+## Step 2: Create Database
 
-1. 在 Render 儀表板中點擊 **"New +"** → **"PostgreSQL"**
-2. 設置數據庫名稱：`pet-finder-db`
-3. 選擇 **"Free"** plan
-4. 點擊 **"Create Database"**
-5. 等待數據庫創建完成
-6. 記下數據庫連接信息
+1. In the Render dashboard, click **"New +"** → **"PostgreSQL"**
+2. Set database name: `pet-finder-db`
+3. Select **"Free"** plan
+4. Click **"Create Database"**
+5. Wait for database creation to complete
+6. Note down the database connection information
 
-## 步驟 3: 創建 Web Service
+## Step 3: Create Web Service
 
-1. 在 Render 儀表板中點擊 **"New +"** → **"Web Service"**
-2. 選擇 **"Build and deploy from a Git repository"**
-3. 選擇您的 `pet-finder` 倉庫
-4. 點擊 **"Connect"**
+1. In the Render dashboard, click **"New +"** → **"Web Service"**
+2. Select **"Build and deploy from a Git repository"**
+3. Choose your `pet-finder` repository
+4. Click **"Connect"**
 
-## 步驟 4: 配置部署設置
+## Step 4: Configure Deployment Settings
 
-### 基本設置：
+### Basic Settings:
 - **Name**: `pet-finder`
 - **Environment**: `Python 3`
-- **Region**: 選擇離您最近的區域
+- **Region**: Choose the region closest to you
 - **Branch**: `main`
-- **Root Directory**: 留空
+- **Root Directory**: Leave empty
 
-### Build & Deploy 設置：
+### Build & Deploy Settings:
 - **Build Command**: 
   ```bash
-  pip install --upgrade pip && pip install -r requirements-prod.txt && python manage.py collectstatic --noinput && python manage.py migrate
+  pip install --upgrade pip && pip install -r requirements-prod.txt && python manage.py collectstatic --noinput
   ```
 - **Start Command**: 
   ```bash
-  gunicorn scraper.wsgi:application --bind 0.0.0.0:$PORT
+  python manage.py migrate && gunicorn scraper.wsgi:application
   ```
 
-### 環境變量設置：
-點擊 **"Advanced"** → **"Add Environment Variable"**，添加以下變量：
+### Environment Variables:
+Click **"Advanced"** → **"Add Environment Variable"**, add the following variables:
 
 | Key | Value |
 |-----|-------|
 | `DEBUG` | `False` |
-| `SECRET_KEY` | 點擊 "Generate" 生成新的密鑰 |
-| `ALLOWED_HOSTS` | `pet-finder.onrender.com` |
-| `DATABASE_URL` | 從步驟 2 創建的數據庫中複製連接字符串 |
+| `SECRET_KEY` | Click "Generate" to create a new key |
+| `ALLOWED_HOSTS` | Leave empty (automatically includes Render domains) |
+| `DATABASE_URL` | Copy connection string from the database created in Step 2 |
 
-## 步驟 5: 部署
+## Step 5: Deploy
 
-1. 點擊 **"Create Web Service"**
-2. 等待部署完成（大約 5-10 分鐘）
-3. 查看部署日誌確認沒有錯誤
+1. Click **"Create Web Service"**
+2. Wait for deployment to complete (approximately 5-10 minutes)
+3. Check deployment logs to ensure no errors
 
-## 步驟 6: 測試部署
+## Step 6: Test Deployment
 
-1. 部署完成後，您會獲得一個 URL（例如：`https://pet-finder.onrender.com`）
-2. 訪問該 URL 測試網站是否正常工作
-3. 測試搜索功能
-4. 確認靜態文件（CSS、JS、圖片）正常加載
+1. After deployment is complete, you will receive a URL (e.g., `https://pet-finder.onrender.com`)
+2. Visit the URL to test if the website works properly
+3. Test the search functionality
+4. Confirm that static files (CSS, JS, images) load correctly
 
-## 常見問題解決
+## Troubleshooting Common Issues
 
-### 問題 1: 部署失敗
-- 檢查 Build Command 是否正確
-- 確認所有環境變量已設置
-- 查看部署日誌中的錯誤信息
+### Issue 1: Deployment Failed
+- Check if Build Command is correct
+- Confirm all environment variables are set
+- View deployment logs for error information
 
-### 問題 2: 網站無法訪問
-- 檢查 `ALLOWED_HOSTS` 環境變量
-- 確認 URL 是否正確
+### Issue 2: Website Unreachable
+- Check `ALLOWED_HOSTS` environment variable
+- Confirm URL is correct
 
-### 問題 3: 數據庫連接錯誤
-- 檢查 `DATABASE_URL` 環境變量
-- 確認數據庫已創建並運行
+### Issue 3: Database Connection Error
+- Check `DATABASE_URL` environment variable
+- Confirm database service is running
 
-### 問題 4: 靜態文件不顯示
-- 確認 `whitenoise` 已正確配置
-- 檢查 `collectstatic` 命令是否成功執行
+### Issue 4: Static Files Not Loading
+- Confirm `whitenoise` is properly configured
+- Check if `collectstatic` command executed successfully
 
-## 自動重新部署
+## Automatic Redeployment
 
-部署成功後，每次您推送代碼到 GitHub 的 `main` 分支時，Render 會自動：
-1. 檢測代碼變更
-2. 重新構建應用
-3. 重新部署
+After successful deployment, every time you push code to the `main` branch on GitHub, Render will automatically:
+1. Detect code changes
+2. Rebuild the application
+3. Redeploy
 
-## 監控和維護
+## Monitoring and Maintenance
 
-1. **查看日誌**: 在 Render 儀表板中查看實時日誌
-2. **監控性能**: 檢查 CPU 和內存使用情況
-3. **備份數據**: 定期備份 PostgreSQL 數據庫
+1. **View Logs**: Check real-time logs in the Render dashboard
+2. **Monitor Performance**: Check CPU and memory usage
+3. **Backup Data**: Regularly backup PostgreSQL database
 
-## 免費 tier 限制
+## Free Tier Limitations
 
-- 應用在 15 分鐘無活動後會休眠
-- 重新啟動需要 30 秒
-- 每月有使用限制
-- 數據庫有存儲限制
+- Application sleeps after 15 minutes of inactivity
+- Restart takes 30 seconds
+- Monthly usage limits
+- Database storage limits
 
-## 升級選項
+## Upgrade Options
 
-如果需要更好的性能，可以考慮升級到付費計劃：
-- 更快的啟動時間
-- 更多資源
-- 更好的支持
+If you need better performance, consider upgrading to a paid plan:
+- Faster startup time
+- More resources
+- Better support
