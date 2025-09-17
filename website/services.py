@@ -255,6 +255,10 @@ class PetFinderScraper:
                         # Only check by profile URL - this is the most reliable way to identify duplicates
                         existing_pet = Pet.objects.filter(profile_url=profile_url).first()
                     
+                    # Get name and breed for logging
+                    name = pet_data.get('name', 'Unknown')
+                    breed = pet_data.get('primary_breed', 'Unknown')
+                    
                     if existing_pet:
                         # Update existing pet with new data
                         for key, value in pet_data.items():
