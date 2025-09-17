@@ -1,0 +1,14 @@
+# Core Django framework
+Django==5.0.4
+
+# HTTP requests library for web scraping
+requests==2.31.0
+
+# Image processing for favicon generation
+Pillow==11.3.0
+
+# Production dependencies
+gunicorn==23.0.0
+whitenoise==6.10.0
+dj-database-url==3.0.1
+psycopg2-binary==2.9.9

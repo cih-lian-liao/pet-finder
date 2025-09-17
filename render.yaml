@@ -3,8 +3,9 @@ services:
     name: pet-finder
     env: python
     plan: free
-    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
-    startCommand: "gunicorn scraper.wsgi:application"
+    pythonVersion: "3.11"
+    buildCommand: "pip install --upgrade pip && pip install -r requirements-prod.txt && python manage.py collectstatic --noinput && python manage.py migrate"
+    startCommand: "gunicorn scraper.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: DEBUG
         value: "False"
@@ -12,10 +13,8 @@ services:
         generateValue: true
       - key: ALLOWED_HOSTS
         value: "pet-finder.onrender.com"
-      - key: DATABASE_URL
-        fromDatabase:
-          name: pet-finder-db
-          property: connectionString
+      - key: PYTHONPATH
+        value: "/opt/render/project/src"
     healthCheckPath: /
 
 databases:
