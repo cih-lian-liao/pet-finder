@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Statistics - Pet Finder</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js for statistics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-paw me-2"></i>Pet Finder
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'home' %}">
+                    <i class="fas fa-home me-1"></i>Home
+                </a>
+                <a class="nav-link active" href="{% url 'pet_stats' %}">
+                    <i class="fas fa-chart-bar me-1"></i>Statistics
+                </a>
+                <a class="nav-link" href="{% url 'download_pets' %}">
+                    <i class="fas fa-download me-1"></i>Download
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Header -->
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-chart-bar me-3"></i>Pet Statistics
+                </h1>
+                <p class="lead text-muted">Comprehensive analytics about pets in our database</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card stats-card border-0">
+                    <div class="card-body text-center">
+                        <i class="fas fa-paw fa-3x mb-3"></i>
+                        <h3 class="card-title">{{ total_pets }}</h3>
+                        <p class="card-text">Total Pets</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card bg-success text-white border-0">
+                    <div class="card-body text-center">
+                        <i class="fas fa-dna fa-3x mb-3"></i>
+                        <h3 class="card-title">{{ total_breeds }}</h3>
+                        <p class="card-text">Unique Breeds</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card bg-info text-white border-0">
+                    <div class="card-body text-center">
+                        <i class="fas fa-layer-group fa-3x mb-3"></i>
+                        <h3 class="card-title">{{ mixed_breeds }}</h3>
+                        <p class="card-text">Mixed Breeds</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card bg-warning text-white border-0">
+                    <div class="card-body text-center">
+                        <i class="fas fa-percentage fa-3x mb-3"></i>
+                        <h3 class="card-title">{{ mixed_breeds|floatformat:0 }}/{{ total_pets|floatformat:0 }}</h3>
+                        <p class="card-text">Mixed Breed %</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="container my-5">
+        <div class="row">
+            <!-- Top Breeds Chart -->
+            <div class="col-lg-6 mb-5">
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-crown me-2"></i>Top 10 Breeds
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="breedsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sex Distribution Chart -->
+            <div class="col-lg-6 mb-5">
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-venus-mars me-2"></i>Gender Distribution
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="sexChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Size Distribution Chart -->
+            <div class="col-lg-6 mb-5">
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-ruler me-2"></i>Size Distribution
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="sizeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Breed vs Mixed Chart -->
+            <div class="col-lg-6 mb-5">
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-warning text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-pie-chart me-2"></i>Pure vs Mixed Breeds
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="breedTypeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Tables -->
+    <div class="container my-5">
+        <div class="row">
+            <!-- Top Breeds Table -->
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>Top Breeds Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Breed</th>
+                                        <th>Count</th>
+                                        <th>Percentage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for breed in top_breeds %}
+                                    <tr>
+                                        <td><span class="badge bg-primary">{{ forloop.counter }}</span></td>
+                                        <td>{{ breed.primary_breed|default:"Unknown" }}</td>
+                                        <td>{{ breed.count }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar" role="progressbar" 
+                                                     style="width: {% widthratio breed.count total_pets 100 %}%"
+                                                     aria-valuenow="{{ breed.count }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="{{ total_pets }}">
+                                                    {% widthratio breed.count total_pets 100 %}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gender Distribution Table -->
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>Gender Distribution
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Gender</th>
+                                        <th>Count</th>
+                                        <th>Percentage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for sex in sex_distribution %}
+                                    <tr>
+                                        <td>
+                                            {% if sex.sex == 'male' %}
+                                                <i class="fas fa-mars text-primary me-2"></i>Male
+                                            {% elif sex.sex == 'female' %}
+                                                <i class="fas fa-venus text-danger me-2"></i>Female
+                                            {% else %}
+                                                <i class="fas fa-question text-muted me-2"></i>{{ sex.sex|title|default:"Unknown" }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ sex.count }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar {% if sex.sex == 'male' %}bg-primary{% elif sex.sex == 'female' %}bg-danger{% else %}bg-secondary{% endif %}" 
+                                                     role="progressbar" 
+                                                     style="width: {% widthratio sex.count total_pets 100 %}%"
+                                                     aria-valuenow="{{ sex.count }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="{{ total_pets }}">
+                                                    {% widthratio sex.count total_pets 100 %}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-paw me-2"></i>Pet Finder</h5>
+                    <p class="mb-0">Comprehensive pet statistics and analytics.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="{% url 'home' %}" class="btn btn-outline-light">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js Configuration -->
+    <script>
+        // Top Breeds Chart
+        const breedsData = {
+            labels: [
+                {% for breed in top_breeds %}
+                '{{ breed.primary_breed|default:"Unknown" }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Number of Pets',
+                data: [
+                    {% for breed in top_breeds %}
+                    {{ breed.count }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                    '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
+                ],
+                borderWidth: 2
+            }]
+        };
+
+        new Chart(document.getElementById('breedsChart'), {
+            type: 'bar',
+            data: breedsData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Sex Distribution Chart
+        const sexData = {
+            labels: [
+                {% for sex in sex_distribution %}
+                '{{ sex.sex|title|default:"Unknown" }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for sex in sex_distribution %}
+                    {{ sex.count }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    '#36A2EB', '#FF6384', '#FFCE56'
+                ],
+                borderWidth: 2
+            }]
+        };
+
+        new Chart(document.getElementById('sexChart'), {
+            type: 'doughnut',
+            data: sexData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Size Distribution Chart
+        const sizeData = {
+            labels: [
+                {% for size in size_distribution %}
+                '{{ size.size|title|default:"Unknown" }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for size in size_distribution %}
+                    {{ size.count }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384'
+                ],
+                borderWidth: 2
+            }]
+        };
+
+        new Chart(document.getElementById('sizeChart'), {
+            type: 'pie',
+            data: sizeData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Breed Type Chart
+        const breedTypeData = {
+            labels: ['Pure Breed', 'Mixed Breed'],
+            datasets: [{
+                data: [{{ total_pets|add:0|add:"-"|add:mixed_breeds }}, {{ mixed_breeds }}],
+                backgroundColor: ['#36A2EB', '#FF6384'],
+                borderWidth: 2
+            }]
+        };
+
+        new Chart(document.getElementById('breedTypeChart'), {
+            type: 'doughnut',
+            data: breedTypeData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

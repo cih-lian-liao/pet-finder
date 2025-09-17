@@ -1,0 +1,19 @@
+# Core Django framework
+Django==5.0.4
+
+# HTTP requests library for web scraping
+requests==2.31.0
+
+# Development and testing dependencies
+pytest==7.4.3
+pytest-django==4.7.0
+coverage==7.3.2
+
+# Production dependencies
+gunicorn==21.2.0
+whitenoise==6.6.0
+
+# Code quality
+flake8==6.1.0
+black==23.9.1
+isort==5.12.0

@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Pet Finder - Find Your Perfect Companion</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* ===== PET FINDER APPLICATION STYLES ===== */
+        /* Global Application Styles */
+        .pet-finder-app {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #F1EEEB 0%, #E4D8CB 100%);
+            min-height: 100vh;
+            color: #A09086;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #F1EEEB 0%, #E4D8CB 100%);
+            min-height: 100vh;
+            color: #A09086;
+        }
+        
+        /* 修復 navbar 和 hero 之間的間隙 */
+        .navbar {
+            margin-bottom: 0 !important;
+        }
+        
+        .hero-search-section {
+            margin-top: 0 !important;
+        }
+        
+        /* ===== PET CARD COMPONENT ===== */
+        .pet-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #CFB3A9;
+            box-shadow: 0 4px 15px rgba(160, 144, 134, 0.15);
+            border-radius: 16px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #F1EEEB 0%, #ffffff 100%);
+        }
+        
+        .pet-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(160, 144, 134, 0.25);
+            border-color: #A09086;
+        }
+        
+        .pet-card__image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .pet-card:hover .pet-card__image {
+            transform: scale(1.05);
+        }
+        
+        .pet-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .pet-card:hover .pet-image {
+            transform: scale(1.05);
+        }
+        
+        .loading {
+            display: none;
+        }
+        
+        /* ===== STATISTICS CARD COMPONENT ===== */
+        .statistics-card {
+            background: linear-gradient(135deg, #ffffff 0%, #F1EEEB 100%);
+            color: #A09086;
+            border-radius: 20px;
+            border: 3px solid #E4D8CB;
+            box-shadow: 0 8px 25px rgba(160, 144, 134, 0.12);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .statistics-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(160, 144, 134, 0.2);
+            border-color: #A09086;
+        }
+        
+        .statistics-card__body {
+            padding: 32px 28px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .statistics-card__icon {
+            color: #CFB3A9;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            transition: all 0.4s ease;
+            filter: drop-shadow(0 2px 4px rgba(160, 144, 134, 0.2));
+        }
+        
+        .statistics-card:hover .statistics-card__icon {
+            color: #A09086;
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 4px 8px rgba(160, 144, 134, 0.3));
+        }
+        
+        .statistics-card__title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #A09086;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 2px rgba(160, 144, 134, 0.1);
+        }
+        
+        .statistics-card__text {
+            font-size: 1rem;
+            color: #CDC6C3;
+            font-weight: 600;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #CFB3A9 0%, #A09086 50%, #CDC6C3 100%);
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(160, 144, 134, 0.2);
+            border-color: #A09086;
+        }
+        
+        .stats-card .card-body {
+            padding: 32px 28px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .stats-card i {
+            color: #CFB3A9;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            transition: all 0.4s ease;
+            filter: drop-shadow(0 2px 4px rgba(160, 144, 134, 0.2));
+        }
+        
+        .stats-card:hover i {
+            color: #A09086;
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 4px 8px rgba(160, 144, 134, 0.3));
+        }
+        
+        .stats-card .card-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #A09086;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 2px rgba(160, 144, 134, 0.1);
+        }
+        
+        .stats-card .card-text {
+            font-size: 1rem;
+            color: #CDC6C3;
+            font-weight: 600;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* 個性化統計卡片配色 */
+        .stats-card:nth-child(1) {
+            background: linear-gradient(135deg, #ffffff 0%, #F1EEEB 100%);
+        }
+        .stats-card:nth-child(1)::before {
+            background: linear-gradient(90deg, #CFB3A9 0%, #A09086 100%);
+        }
+        .stats-card:nth-child(1) i {
+            color: #CFB3A9;
+        }
+        .stats-card:nth-child(1):hover i {
+            color: #A09086;
+        }
+        
+        .stats-card:nth-child(2) {
+            background: linear-gradient(135deg, #ffffff 0%, #F1EEEB 100%);
+        }
+        .stats-card:nth-child(2)::before {
+            background: linear-gradient(90deg, #CDC6C3 0%, #CFB3A9 100%);
+        }
+        .stats-card:nth-child(2) i {
+            color: #CDC6C3;
+        }
+        .stats-card:nth-child(2):hover i {
+            color: #CFB3A9;
+        }
+        
+        .stats-card:nth-child(3) {
+            background: linear-gradient(135deg, #ffffff 0%, #F1EEEB 100%);
+        }
+        .stats-card:nth-child(3)::before {
+            background: linear-gradient(90deg, #E4D8CB 0%, #CDC6C3 100%);
+        }
+        .stats-card:nth-child(3) i {
+            color: #E4D8CB;
+        }
+        .stats-card:nth-child(3):hover i {
+            color: #CDC6C3;
+        }
+        
+        /* ===== NAVIGATION BAR COMPONENT ===== */
+        .navbar--pet-finder {
+            background: linear-gradient(135deg, #A09086 0%, #CDC6C3 100%) !important;
+            box-shadow: 0 4px 15px rgba(160, 144, 134, 0.2);
+            backdrop-filter: blur(10px);
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .navbar__brand--pet-finder {
+            color: #F1EEEB !important;
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .navbar__link--pet-finder {
+            color: rgba(241, 238, 235, 0.9) !important;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar__link--pet-finder:hover {
+            color: #F1EEEB !important;
+            background-color: rgba(241, 238, 235, 0.15);
+        }
+        
+        /* ===== HERO SEARCH SECTION ===== */
+        .hero-search-section {
+            background: linear-gradient(135deg, #A09086 0%, #CFB3A9 100%);
+            color: #F1EEEB;
+            position: relative;
+            overflow: hidden;
+            margin-top: 0;
+            padding-top: 0;
+        }
+        
+        .search-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: -0.5px;
+        }
+        
+        /* ===== SEARCH FORM COMPONENT ===== */
+        .search-form-container {
+            background: linear-gradient(135deg, #F1EEEB 0%, #E4D8CB 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(160, 144, 134, 0.2);
+            border: 2px solid #CFB3A9;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 16px;
+            padding: 12px 16px;
+            background: #ffffff;
+            position: relative;
+            color: #495057;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #6c757d;
+            box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.1);
+            transform: translateY(-1px);
+            background: #ffffff;
+            outline: none;
+        }
+        
+        .form-control:hover, .form-select:hover {
+            border-color: #adb5bd;
+            background: #ffffff;
+        }
+        
+        /* 下拉選單專用樣式 */
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+        }
+        
+        .form-select:focus {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236c757d' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #A09086;
+            margin-bottom: 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-text {
+            font-size: 0.8rem;
+            color: #CDC6C3;
+            margin-top: 4px;
+        }
+        
+        .form-check-input:checked {
+            background-color: #A09086;
+            border-color: #A09086;
+        }
+        
+        .form-check-label {
+            font-weight: 500;
+            color: #A09086;
+        }
+        
+        /* ===== BUTTON COMPONENTS ===== */
+        .btn--primary-pet-finder {
+            background: linear-gradient(135deg, #A09086 0%, #CFB3A9 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 32px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(160, 144, 134, 0.25);
+            position: relative;
+            overflow: hidden;
+            color: #F1EEEB;
+        }
+        
+        .btn--primary-pet-finder:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(160, 144, 134, 0.35);
+            background: linear-gradient(135deg, #CDC6C3 0%, #A09086 100%);
+            color: #F1EEEB;
+        }
+        
+        .btn--primary-pet-finder:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+        
+        /* ===== FILTER SECTION COMPONENT ===== */
+        .filter-section {
+            background: linear-gradient(135deg, #F1EEEB 0%, #E4D8CB 100%);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 20px rgba(160, 144, 134, 0.15);
+            border: 2px solid #CFB3A9;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .filter-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #CDC6C3 0%, #A09086 100%);
+        }
+        
+        .filter-form-container {
+            background: linear-gradient(135deg, #ffffff 0%, #F1EEEB 100%);
+            border-radius: 12px;
+            padding: 24px;
+            border: 2px solid #CFB3A9;
+            box-shadow: 0 2px 10px rgba(160, 144, 134, 0.1);
+        }
+        
+        .filter-form__label {
+            font-weight: 600;
+            color: #A09086;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .filter-form__input {
+            border-radius: 8px;
+            border: 2px solid #CFB3A9;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background-color: #F1EEEB;
+            color: #A09086;
+        }
+        
+        .filter-form__input:focus {
+            border-color: #A09086;
+            box-shadow: 0 0 0 3px rgba(160, 144, 134, 0.15);
+            transform: translateY(-1px);
+            background-color: #F1EEEB;
+            color: #A09086;
+        }
+        
+        .active-filters {
+            background: linear-gradient(135deg, rgba(207, 179, 169, 0.1) 0%, rgba(205, 198, 195, 0.1) 100%);
+            border-radius: 8px;
+            padding: 12px 16px;
+            border-left: 4px solid #A09086;
+        }
+        
+        .active-filters__badge {
+            font-size: 0.8rem;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .active-filters__badge:hover {
+            transform: scale(1.05);
+        }
+        
+        .active-filters__badge-link {
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .active-filters__badge-link:hover {
+            color: #ffc107 !important;
+        }
+        
+        .filter-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #CDC6C3 0%, #A09086 100%);
+        }
+        
+        .filter-form-container {
+            background: linear-gradient(135deg, #ffffff 0%, #F1EEEB 100%);
+            border-radius: 12px;
+            padding: 24px;
+            border: 2px solid #CFB3A9;
+            box-shadow: 0 2px 10px rgba(160, 144, 134, 0.1);
+        }
+        
+        .filter-form .form-label {
+            font-weight: 600;
+            color: #A09086;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .filter-form .form-control,
+        .filter-form .form-select {
+            border-radius: 8px;
+            border: 2px solid #CFB3A9;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background-color: #F1EEEB;
+            color: #A09086;
+        }
+        
+        .filter-form .form-control:focus,
+        .filter-form .form-select:focus {
+            border-color: #A09086;
+            box-shadow: 0 0 0 3px rgba(160, 144, 134, 0.15);
+            transform: translateY(-1px);
+            background-color: #F1EEEB;
+            color: #A09086;
+        }
+        
+        .active-filters {
+            background: linear-gradient(135deg, rgba(207, 179, 169, 0.1) 0%, rgba(205, 198, 195, 0.1) 100%);
+            border-radius: 8px;
+            padding: 12px 16px;
+            border-left: 4px solid #A09086;
+        }
+        
+        .active-filters .badge {
+            font-size: 0.8rem;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .active-filters .badge:hover {
+            transform: scale(1.05);
+        }
+        
+        .active-filters .badge a {
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .active-filters .badge a:hover {
+            color: #ffc107 !important;
+        }
+        
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .form-control, .form-select {
+                font-size: 16px; /* 防止iOS縮放 */
+            }
+            
+            .pet-card:hover {
+                transform: translateY(-4px) scale(1.01);
+            }
+        }
+        
+        /* 動畫效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        /* 徽章樣式 */
+        .badge {
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-weight: 500;
+        }
+        
+        /* ===== TYPOGRAPHY COMPONENTS ===== */
+        .page-title {
+            background: linear-gradient(135deg, #A09086 0%, #CDC6C3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #A09086;
+            margin-bottom: 1rem;
+        }
+        
+        .subsection-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #A09086;
+            margin-bottom: 0.8rem;
+        }
+        
+        /* 導航欄樣式 */
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        /* 警告按鈕樣式 */
+        .btn-warning {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+            background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+        }
+        
+        /* 成功按鈕樣式 */
+        .btn-success {
+            background: linear-gradient(135deg, #212529 0%, #343a40 100%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(33, 37, 41, 0.2);
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(33, 37, 41, 0.3);
+            background: linear-gradient(135deg, #000000 0%, #212529 100%);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #212529 0%, #343a40 100%); backdrop-filter: blur(10px);">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-paw me-2"></i>Pet Finder
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link px-3 py-2 rounded" href="{% url 'home' %}">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded" href="{% url 'pet_stats' %}">
+                        <i class="fas fa-chart-bar me-1"></i>Statistics
+                    </a>
+                    <a class="nav-link px-3 py-2 rounded" href="{% url 'download_pets' %}">
+                        <i class="fas fa-download me-1"></i>Download
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Hero Section -->
+    <div class="hero-search-section py-5">
+<div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold mb-4">
+                        <i class="fas fa-heart me-3"></i>Find Your Perfect Pet
+                    </h1>
+                    <p class="lead mb-4">
+                        Discover amazing pets waiting for their forever homes. 
+                        Search by location and find your new best friend today!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="search-form-container p-5 fade-in-up">
+                    <h3 class="card-title text-center mb-5 page-title">
+                        <i class="fas fa-search me-3"></i>Search for Pets
+                    </h3>
+                        
+                        <form method="POST" action="{% url 'home' %}" id="searchForm">
+                {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ search_form.city.id_for_label }}" class="form-label">
+                                        <i class="fas fa-map-marker-alt me-1"></i>City
+                                    </label>
+                                    {{ search_form.city }}
+                                    {% if search_form.city.help_text %}
+                                        <div class="form-text">{{ search_form.city.help_text }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="{{ search_form.state.id_for_label }}" class="form-label">
+                                        <i class="fas fa-map me-1"></i>State
+                                    </label>
+                                    {{ search_form.state }}
+                                    {% if search_form.state.help_text %}
+                                        <div class="form-text">{{ search_form.state.help_text }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="{{ search_form.animal.id_for_label }}" class="form-label">
+                                        <i class="fas fa-paw me-1"></i>Animal Type
+                                    </label>
+                                    {{ search_form.animal }}
+                                    {% if search_form.animal.help_text %}
+                                        <div class="form-text">{{ search_form.animal.help_text }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="{{ search_form.distance.id_for_label }}" class="form-label">
+                                        <i class="fas fa-route me-1"></i>Search Radius
+                                    </label>
+                                    {{ search_form.distance }}
+                                    {% if search_form.distance.help_text %}
+                                        <div class="form-text">{{ search_form.distance.help_text }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="btn btn--primary-pet-finder btn-lg px-5" id="searchBtn">
+                                        <i class="fas fa-search me-2"></i>Find Pets
+                                    </button>
+                                    
+                                    <div class="loading mt-3">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">Searching for pets...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    {% if total_pets > 0 %}
+    <div class="container my-4">
+        <div class="row g-3">
+            <div class="col-lg-4 col-md-6">
+                <div class="card statistics-card">
+                    <div class="statistics-card__body text-center">
+                        <i class="fas fa-paw statistics-card__icon"></i>
+                        <h3 class="statistics-card__title">{{ total_pets }}</h3>
+                        <p class="statistics-card__text">Total Pets Available</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card statistics-card">
+                    <div class="statistics-card__body text-center">
+                        <i class="fas fa-heart statistics-card__icon"></i>
+                        <h3 class="statistics-card__title">{{ recent_pets|length }}</h3>
+                        <p class="statistics-card__text">Recently Added</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card statistics-card">
+                    <div class="statistics-card__body text-center">
+                        <i class="fas fa-home statistics-card__icon"></i>
+                        <h3 class="statistics-card__title">Ready</h3>
+                        <p class="statistics-card__text">For Adoption</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Filter and Actions -->
+    {% if pets %}
+    <div class="container my-5">
+        <div class="filter-section fade-in-up">
+            <!-- 標題和結果統計 -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <h4 class="page-title mb-2">
+                        <i class="fas fa-filter me-2"></i>Filter Results
+                    </h4>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-paw me-1"></i>
+                        Showing {{ pets|length }} pet{{ pets|length|pluralize }} 
+                        {% if filter_form.data.breed or filter_form.data.sex or filter_form.data.size or filter_form.data.age %}
+                            (filtered)
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <form method="POST" action="{% url 'clear_pets' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to clear all pets?')">
+                                <i class="fas fa-trash me-1"></i>Clear All
+                            </button>
+                        </form>
+                        
+                        <a href="{% url 'download_pets' %}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-download me-1"></i>Download CSV
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 過濾表單 -->
+            <div class="filter-form-container">
+                <form method="GET" class="filter-form">
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-md-6">
+                            <label class="filter-form__label">
+                                <i class="fas fa-dog me-1"></i>Breed
+                            </label>
+                            <input type="text" name="breed" class="filter-form__input" 
+                                   placeholder="e.g., Golden Retriever" 
+                                   value="{{ filter_form.data.breed|default:'' }}">
+                        </div>
+                        
+                        <div class="col-lg-2 col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-venus-mars me-1"></i>Gender
+                            </label>
+                            <select name="sex" class="form-select">
+                                <option value="">All Genders</option>
+                                <option value="male" {% if filter_form.data.sex == 'male' %}selected{% endif %}>
+                                    <i class="fas fa-mars"></i> Male
+                                </option>
+                                <option value="female" {% if filter_form.data.sex == 'female' %}selected{% endif %}>
+                                    <i class="fas fa-venus"></i> Female
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-lg-2 col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-expand-arrows-alt me-1"></i>Size
+                            </label>
+                            <select name="size" class="form-select">
+                                <option value="">All Sizes</option>
+                                <option value="small" {% if filter_form.data.size == 'small' %}selected{% endif %}>Small</option>
+                                <option value="medium" {% if filter_form.data.size == 'medium' %}selected{% endif %}>Medium</option>
+                                <option value="large" {% if filter_form.data.size == 'large' %}selected{% endif %}>Large</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-lg-2 col-md-6">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-alt me-1"></i>Age
+                            </label>
+                            <input type="text" name="age" class="form-control" 
+                                   placeholder="e.g., 2 years" 
+                                   value="{{ filter_form.data.age|default:'' }}">
+                        </div>
+                        
+                        <div class="col-lg-3 col-md-12">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn--primary-pet-finder flex-fill">
+                                    <i class="fas fa-search me-1"></i>Apply Filter
+                                </button>
+                                <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i>Clear
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- 活躍的過濾器標籤 -->
+                {% if filter_form.data.breed or filter_form.data.sex or filter_form.data.size or filter_form.data.age %}
+                <div class="active-filters mt-3">
+                    <small class="text-muted me-2">Active filters:</small>
+                    {% if filter_form.data.breed %}
+                    <span class="badge bg-primary me-1">
+                        Breed: {{ filter_form.data.breed }}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'breed' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" class="text-white ms-1">×</a>
+                    </span>
+                    {% endif %}
+                    {% if filter_form.data.sex %}
+                    <span class="badge bg-primary me-1">
+                        Gender: {{ filter_form.data.sex|title }}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'sex' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" class="text-white ms-1">×</a>
+                    </span>
+                    {% endif %}
+                    {% if filter_form.data.size %}
+                    <span class="badge bg-primary me-1">
+                        Size: {{ filter_form.data.size|title }}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'size' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" class="text-white ms-1">×</a>
+                    </span>
+                    {% endif %}
+                    {% if filter_form.data.age %}
+                    <span class="badge bg-primary me-1">
+                        Age: {{ filter_form.data.age }}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'age' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" class="text-white ms-1">×</a>
+                    </span>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pets Grid -->
+    {% if pets %}
+    <div class="container my-5">
+        <div class="row">
+            {% for pet in pets %}
+            <div class="col-lg-4 col-md-6 mb-4 fade-in-up" style="animation-delay: {{ forloop.counter0|floatformat:0|add:'0.1' }}s">
+                <div class="card pet-card h-100">
+                    {% if pet.photo_url %}
+                    <img src="{{ pet.photo_url }}" class="pet-image" alt="{{ pet.display_name }}" 
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='">
+                    {% else %}
+                    <div class="pet-image bg-light d-flex align-items-center justify-content-center">
+                        <i class="fas fa-paw fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <h5 class="card-title">{{ pet.display_name }}</h5>
+                        
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-dog me-1"></i>{{ pet.primary_breed|default:"Unknown Breed" }}
+                                {% if pet.secondary_breed %}
+                                    / {{ pet.secondary_breed }}
+                                {% endif %}
+                            </small>
+                        </div>
+                        
+                        <div class="row g-2 mb-3">
+                            {% if pet.age %}
+                            <div class="col-6">
+                                <small><strong>Age:</strong> {{ pet.age }}</small>
+                            </div>
+                            {% endif %}
+                            {% if pet.sex %}
+                            <div class="col-6">
+                                <small><strong>Sex:</strong> {{ pet.sex|title }}</small>
+                            </div>
+                            {% endif %}
+                            {% if pet.size %}
+                            <div class="col-6">
+                                <small><strong>Size:</strong> {{ pet.size|title }}</small>
+                            </div>
+                            {% endif %}
+                            {% if pet.primary_color %}
+                            <div class="col-6">
+                                <small><strong>Color:</strong> {{ pet.primary_color }}</small>
+                            </div>
+                            {% endif %}
+                            {% if pet.location_display %}
+                            <div class="col-12">
+                                <small><strong>Location:</strong> {{ pet.location_display }}</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-primary">{{ pet.adoption_fee_display }}</span>
+                            
+                            {% if pet.profile_url %}
+                            <a href="{{ pet.profile_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-external-link-alt me-1"></i>View Profile
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if pets.has_other_pages %}
+        <nav aria-label="Pet pagination" class="mt-5">
+            <ul class="pagination justify-content-center">
+                {% if pets.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ pets.previous_page_number }}{% if request.GET.breed %}&breed={{ request.GET.breed }}{% endif %}{% if request.GET.sex %}&sex={{ request.GET.sex }}{% endif %}{% if request.GET.size %}&size={{ request.GET.size }}{% endif %}{% if request.GET.age %}&age={{ request.GET.age }}{% endif %}">Previous</a>
+                </li>
+                {% endif %}
+                
+                {% for num in pets.paginator.page_range %}
+                    {% if pets.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > pets.number|add:'-3' and num < pets.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if request.GET.breed %}&breed={{ request.GET.breed }}{% endif %}{% if request.GET.sex %}&sex={{ request.GET.sex }}{% endif %}{% if request.GET.size %}&size={{ request.GET.size }}{% endif %}{% if request.GET.age %}&age={{ request.GET.age }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if pets.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ pets.next_page_number }}{% if request.GET.breed %}&breed={{ request.GET.breed }}{% endif %}{% if request.GET.sex %}&sex={{ request.GET.sex }}{% endif %}{% if request.GET.size %}&size={{ request.GET.size }}{% endif %}{% if request.GET.age %}&age={{ request.GET.age }}{% endif %}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+    {% elif total_pets == 0 %}
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <i class="fas fa-search fa-5x text-muted mb-4"></i>
+                <h3 class="text-muted">No Pets Found</h3>
+                <p class="text-muted">Start by searching for pets in your area using the form above.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-paw me-2"></i>Pet Finder</h5>
+                    <p class="mb-0">Helping pets find their forever homes since 2024.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="mb-0">
+                        <small>Data provided by PetFinder.com</small>
+                    </p>
+        </div>
+    </div>
+</div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form submission handling
+            document.getElementById('searchForm').addEventListener('submit', function() {
+                document.querySelector('.loading').style.display = 'block';
+                document.getElementById('searchBtn').disabled = true;
+                document.getElementById('searchBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Searching...';
+            });
+            
+            // 自動滑動到結果區域的功能
+            function scrollToResults() {
+                // 檢查是否有寵物結果
+                const petsSection = document.querySelector('.container .row');
+                if (petsSection && petsSection.children.length > 0) {
+                    // 檢查是否有搜索相關的參數或消息
+                    const hasPets = document.querySelector('.pet-card');
+                    const hasStats = document.querySelector('.stats-card');
+                    const hasFilter = document.querySelector('.filter-section');
+                    
+                    if (hasPets || hasStats || hasFilter) {
+                        // 等待頁面完全載入後滑動
+                        setTimeout(function() {
+                            // 優先滑動到統計卡片，如果沒有則滑動到過濾器，最後是寵物網格
+                            const targetElement = hasStats ? document.querySelector('.stats-card') :
+                                                 hasFilter ? document.querySelector('.filter-section') :
+                                                 document.querySelector('.container .row');
+                            
+                            if (targetElement) {
+                                // 平滑滑動到目標元素
+                                targetElement.scrollIntoView({ 
+                                    behavior: 'smooth', 
+                                    block: 'start',
+                                    inline: 'nearest'
+                                });
+                                
+                                // 添加高亮效果
+                                if (targetElement.classList.contains('stats-card')) {
+                                    // 如果是統計卡片，添加脈衝效果
+                                    targetElement.style.animation = 'pulse 1s ease-in-out 2';
+                                    setTimeout(() => {
+                                        targetElement.style.animation = '';
+                                    }, 2000);
+                                }
+                                
+                                // 如果是過濾器區域，添加邊框高亮
+                                if (targetElement.classList.contains('filter-section')) {
+                                    targetElement.style.border = '3px solid #A09086';
+                                    targetElement.style.boxShadow = '0 8px 30px rgba(160, 144, 134, 0.3)';
+                                    setTimeout(() => {
+                                        targetElement.style.border = '';
+                                        targetElement.style.boxShadow = '';
+                                    }, 3000);
+                                }
+                            }
+                        }, 1500); // 等待 1.5 秒確保內容已載入
+                    }
+                }
+            }
+            
+            // 檢查是否需要自動滑動
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasSearchParams = urlParams.has('city') || urlParams.has('state') || urlParams.has('animal') || urlParams.has('distance');
+            const hasMessages = document.querySelector('.alert');
+            
+            // 如果有搜索參數或有成功消息，則自動滑動
+            if (hasSearchParams || hasMessages) {
+                scrollToResults();
+            }
+            
+            // Auto-dismiss alerts after 5 seconds
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+            
+            // Form field enhancements
+            const formControls = document.querySelectorAll('.form-control, .form-select');
+            formControls.forEach(function(control) {
+                // Add focus/blur effects
+                control.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                });
+                
+                control.addEventListener('blur', function() {
+                    this.parentElement.classList.remove('focused');
+                });
+                
+                // Add validation styling
+                control.addEventListener('change', function() {
+                    if (this.value.trim() !== '') {
+                        this.classList.add('is-valid');
+                        this.classList.remove('is-invalid');
+                    } else if (this.hasAttribute('required')) {
+                        this.classList.add('is-invalid');
+                        this.classList.remove('is-valid');
+                    }
+                });
+            });
+            
+            // Distance selector enhancement
+            const distanceSelect = document.getElementById('distance');
+            if (distanceSelect) {
+                distanceSelect.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    if (selectedOption.value) {
+                        // Add visual feedback for distance selection
+                        this.style.borderColor = '#28a745';
+                    }
+                });
+            }
+            
+            // Animal type selector enhancement
+            const animalSelect = document.getElementById('animal');
+            if (animalSelect) {
+                animalSelect.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    if (selectedOption.value) {
+                        // Add visual feedback for animal selection
+                        this.style.borderColor = '#28a745';
+                    }
+                });
+            }
+            
+            // State selector enhancement
+            const stateSelect = document.getElementById('state');
+            if (stateSelect) {
+                stateSelect.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    if (selectedOption.value) {
+                        // Add visual feedback for state selection
+                        this.style.borderColor = '#28a745';
+                    }
+                });
+            }
+        });
+        
+        // 添加 CSS 動畫樣式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { 
+                    transform: scale(1); 
+                    box-shadow: 0 8px 25px rgba(160, 144, 134, 0.12); 
+                }
+                50% { 
+                    transform: scale(1.05); 
+                    box-shadow: 0 15px 40px rgba(160, 144, 134, 0.3); 
+                }
+                100% { 
+                    transform: scale(1); 
+                    box-shadow: 0 8px 25px rgba(160, 144, 134, 0.12); 
+                }
+            }
+            
+            .scroll-highlight {
+                animation: pulse 1s ease-in-out 2;
+            }
+            
+            /* 滑動指示器 */
+            .scroll-indicator {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                background: linear-gradient(135deg, #A09086 0%, #CFB3A9 100%);
+                color: #F1EEEB;
+                border: none;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 15px rgba(160, 144, 134, 0.3);
+                cursor: pointer;
+                transition: all 0.3s ease;
+                z-index: 1000;
+                opacity: 0;
+                transform: translateY(100px);
+            }
+            
+            .scroll-indicator.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            
+            .scroll-indicator:hover {
+                transform: scale(1.1);
+                box-shadow: 0 6px 20px rgba(160, 144, 134, 0.4);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
