@@ -7,6 +7,8 @@ all the URL patterns for the pet finder application.
 
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from website.views import (
     HomePageView, ClearPetsView, DownloadPetsView, 
     PetDetailView, PetStatsView
@@ -25,3 +27,7 @@ urlpatterns = [
     path('pet/<int:pet_id>/', PetDetailView.as_view(), name='pet_detail'),
     path('stats/', PetStatsView.as_view(), name='pet_stats'),
 ]
+
+# Serve static files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

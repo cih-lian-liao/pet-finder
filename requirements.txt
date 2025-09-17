@@ -4,6 +4,9 @@ Django==5.0.4
 # HTTP requests library for web scraping
 requests==2.31.0
 
+# Image processing for favicon generation
+Pillow==11.3.0
+
 # Development and testing dependencies
 pytest==7.4.3
 pytest-django==4.7.0
