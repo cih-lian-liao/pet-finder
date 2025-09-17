@@ -145,8 +145,12 @@ DATABASES = {
 
 # Production database configuration
 if 'DATABASE_URL' in os.environ:
-    import dj_database_url
-    DATABASES['default'] = dj_database_url.parse(os.environ['DATABASE_URL'])
+    try:
+        import dj_database_url
+        DATABASES['default'] = dj_database_url.parse(os.environ['DATABASE_URL'])
+    except ImportError:
+        # Fallback to SQLite if dj_database_url is not available
+        pass
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
